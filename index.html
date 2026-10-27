@@ -1,0 +1,898 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Physics Mock Results</title>
+<style>
+:root {
+  --bg: #f5f6f8; --card: #ffffff; --ink: #1c2230; --muted: #5b6475; --line: #dfe3ea;
+  --brand: #2453a6; --brand-ink: #ffffff; --brand-soft: #e7eefb;
+  --green: #1f8a4c; --green-soft: #ddf3e6; --amber: #b86e00; --amber-soft: #fdf0d6; --red: #c0392b; --red-soft: #fbe2df;
+  --radius: 10px; --shadow: 0 1px 2px rgba(20, 30, 50, .06), 0 2px 8px rgba(20, 30, 50, .05);
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151c; --card: #1b2029; --ink: #e8ebf1; --muted: #a3abba; --line: #2e3542;
+    --brand: #6b9cf0; --brand-ink: #0d1320; --brand-soft: #1e2b44;
+    --green: #4cc483; --green-soft: #173528; --amber: #f0b04a; --amber-soft: #3a2c14; --red: #f07a6c; --red-soft: #3d1f1c;
+  }
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.5 var(--font); }
+a { color: var(--brand); }
+.wrap { max-width: 980px; margin: 0 auto; padding: 16px; }
+.wrap.wide { max-width: 1240px; }
+header.top { background: var(--card); border-bottom: 1px solid var(--line); }
+header.top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 12px; padding-bottom: 12px; flex-wrap: wrap; }
+header.top h1 { font-size: 1.15rem; margin: 0; }
+header.top p { margin: 0; color: var(--muted); font-size: .9rem; }
+h2 { font-size: 1.25rem; margin: 0 0 12px; }
+h3 { font-size: 1.05rem; margin: 18px 0 8px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 18px; margin: 16px 0; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+.hidden { display: none !important; }
+label { display: block; font-weight: 600; margin: 12px 0 4px; }
+input[type=text], input[type=password], input[type=number], select {
+  width: 100%; max-width: 420px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: inherit; background: var(--card); color: var(--ink);
+}
+input:focus, select:focus, button:focus-visible { outline: 3px solid var(--brand-soft); outline-offset: 1px; border-color: var(--brand); }
+button, .btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 8px; border: 1px solid var(--brand);
+  background: var(--brand); color: var(--brand-ink); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+button.secondary { background: var(--card); color: var(--brand); }
+button.danger { background: var(--red); border-color: var(--red); color: #fff; }
+button.ghost { background: transparent; border-color: var(--line); color: var(--ink); font-weight: 500; }
+button.small { padding: 5px 10px; font-size: .85rem; }
+button:disabled { opacity: .55; cursor: not-allowed; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.msg { margin-top: 12px; padding: 10px 12px; border-radius: 8px; }
+.msg.error { background: var(--red-soft); color: var(--red); }
+.msg.ok { background: var(--green-soft); color: var(--green); }
+
+/* paper choice */
+.choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; margin-top: 6px; }
+.choice { border: 2px solid var(--line); border-radius: var(--radius); padding: 12px; cursor: pointer; background: var(--card); text-align: left; color: var(--ink); font-weight: 500; display: block; }
+.choice b { display: block; font-size: 1.02rem; }
+.choice[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-soft); }
+
+/* mark entry */
+.qgroup { border-top: 1px solid var(--line); padding: 10px 0; }
+.qgroup h4 { margin: 4px 0 6px; font-size: 1rem; }
+.qrow { display: grid; grid-template-columns: 70px 1fr auto; gap: 10px; align-items: center; padding: 6px 0; }
+.qrow .lab { font-weight: 700; font-variant-numeric: tabular-nums; }
+.qrow .topic { color: var(--muted); font-size: .88rem; }
+.qrow .entry { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.qrow input[type=number] { width: 76px; text-align: center; padding: 8px; }
+.qrow input.bad { border-color: var(--red); background: var(--red-soft); }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; background: var(--card); color: var(--ink); font-weight: 600; padding: 8px 12px; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"].wrong { background: var(--red-soft); color: var(--red); }
+.seg button[aria-pressed="true"].right { background: var(--green-soft); color: var(--green); }
+.sticky { position: sticky; bottom: 0; background: var(--card); border-top: 1px solid var(--line); padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin: 0 -18px -18px; border-radius: 0 0 var(--radius) var(--radius); }
+
+/* results */
+.score { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { background: var(--brand-soft); border-radius: var(--radius); padding: 12px 14px; }
+.stat .v { font-size: 1.7rem; font-weight: 800; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.stat .k { color: var(--muted); font-size: .85rem; }
+.bars { display: grid; gap: 8px; }
+.bar { display: grid; grid-template-columns: minmax(140px, 1.3fr) 2fr 92px; gap: 10px; align-items: center; }
+.bar .name { font-size: .92rem; }
+.bar .name small { display: block; color: var(--muted); }
+.bar .track { height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
+.bar .fill { height: 100%; border-radius: 7px; }
+.bar .val { text-align: right; font-variant-numeric: tabular-nums; font-size: .9rem; }
+.fill.green, .cell.green { background: var(--green); }
+.fill.amber, .cell.amber { background: var(--amber); }
+.fill.red, .cell.red { background: var(--red); }
+.todo { list-style: none; padding: 0; margin: 0; }
+.todo li { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin: 8px 0; display: grid; grid-template-columns: 22px 1fr; gap: 8px; }
+.todo li .box { width: 18px; height: 18px; border: 2px solid var(--muted); border-radius: 4px; margin-top: 3px; }
+.todo li b { display: block; }
+.todo li span { color: var(--muted); font-size: .9rem; }
+.legend { display: flex; gap: 14px; flex-wrap: wrap; font-size: .85rem; color: var(--muted); margin: 8px 0; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+
+/* teacher */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin-top: 8px; flex-wrap: wrap; }
+.tabs button { background: transparent; color: var(--muted); border: 0; border-bottom: 3px solid transparent; border-radius: 0; padding: 10px 14px; }
+.tabs button[aria-selected="true"] { color: var(--brand); border-bottom-color: var(--brand); }
+.pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pills button { background: var(--card); color: var(--ink); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; font-weight: 600; }
+.pills button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); border-color: var(--brand); }
+.toolbar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between; margin: 12px 0; }
+.toolbar select { width: auto; }
+.tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+th { background: var(--bg); position: sticky; top: 0; font-weight: 700; }
+th.sortable { cursor: pointer; user-select: none; }
+th.sortable::after { content: " \2195"; color: var(--muted); font-weight: 400; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+tr.clickable { cursor: pointer; }
+tr.clickable:hover td { background: var(--brand-soft); }
+.cell { color: #fff; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; min-width: 52px; }
+.cell.none { background: transparent; color: var(--muted); }
+.heat th.rot { font-size: .78rem; white-space: normal; min-width: 60px; text-align: center; }
+.grades { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.grades span { background: var(--card); border: 1px solid var(--line); border-radius: 6px; padding: 2px 8px; font-size: .85rem; }
+code.code { font-size: 1.05rem; letter-spacing: .12em; background: var(--brand-soft); padding: 2px 8px; border-radius: 6px; }
+.badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.badge.open { background: var(--green-soft); color: var(--green); }
+.badge.closed { background: var(--red-soft); color: var(--red); }
+dialog { border: 1px solid var(--line); border-radius: var(--radius); padding: 0; max-width: min(760px, calc(100vw - 32px)); width: 100%; background: var(--card); color: var(--ink); }
+dialog::backdrop { background: rgba(10, 15, 25, .45); }
+dialog .dhead { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+dialog .dbody { padding: 14px 18px; max-height: 70vh; overflow: auto; }
+.btable td input[type=number] { width: 80px; }
+
+@media (max-width: 560px) {
+  .qrow { grid-template-columns: 56px 1fr; }
+  .qrow .entry { grid-column: 1 / -1; justify-content: flex-end; }
+  .bar { grid-template-columns: 1fr 80px; }
+  .bar .track { grid-column: 1 / -1; grid-row: 2; }
+}
+@media print {
+  header.top, .tabs, .toolbar button, .noprint, .pills { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card { box-shadow: none; border: 0; padding: 0; }
+  .cell { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .tablewrap { overflow: visible; border: 0; }
+}
+.mt { margin-top: 16px; }
+.legend i.cell { min-width: 0; padding: 0; }
+
+.modes { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; overflow: hidden; }
+.modes button { border: 0; border-radius: 0; background: var(--card); color: var(--ink); padding: 7px 16px; }
+.modes button[aria-pressed="true"] { background: var(--brand); color: var(--brand-ink); }
+.drop { border: 2px dashed var(--line); border-radius: var(--radius); padding: 22px; text-align: center; background: var(--bg); }
+.drop.over { border-color: var(--brand); background: var(--brand-soft); }
+textarea { width: 100%; min-height: 110px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; background: var(--card); color: var(--ink); }
+.steps { margin: 0; padding-left: 20px; }
+.steps li { margin: 4px 0; }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.grid2 .card { margin: 0; }
+#import-log .msg { margin-top: 8px; }
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap wide">
+  <div><h1 id="title">Physics Mock Results</h1><p id="subtitle"></p></div>
+  <div class="modes noprint" id="modes" role="group" aria-label="Mode">
+    <button type="button" data-mode="student" aria-pressed="true">Student</button>
+    <button type="button" data-mode="teacher" aria-pressed="false">Teacher</button>
+  </div>
+</div></header>
+
+<main class="wrap wide">
+<!-- ============================== STUDENT ============================== -->
+<div id="student">
+  <section id="start" class="card">
+    <h2>1. Who are you, and which paper?</h2>
+    <p class="muted small">Enter your marks once your marked paper has been returned. Everything stays on this device until you send your result to your teacher.</p>
+    <label id="paper-label">Paper</label>
+    <div id="papers" class="choices" role="group" aria-labelledby="paper-label"></div>
+    <label for="name">Your full name</label>
+    <input id="name" type="text" autocomplete="name" maxlength="60" placeholder="e.g. Sara Ahmed">
+    <label for="class">Your class</label>
+    <select id="class"><option value="">Choose your class…</option></select>
+    <div class="row mt"><button id="continue" type="button">Continue</button></div>
+    <div id="start-msg" class="msg error hidden" role="alert"></div>
+  </section>
+
+  <section id="entry" class="card hidden">
+    <h2 id="entry-title">2. Enter your marks</h2>
+    <p class="muted small">Type the mark awarded for each part. For multiple-choice questions, choose ✓ if correct or ✗ if not.</p>
+    <div id="form"></div>
+    <div id="entry-msg" class="msg error hidden" role="alert"></div>
+    <div class="sticky">
+      <div><b>Running total: <span id="running">0</span></b> <span class="muted">/ <span id="paper-max">0</span></span> <span class="muted small" id="filled"></span></div>
+      <div class="row"><button id="back" type="button" class="ghost">Back</button><button id="submit" type="button">See my result</button></div>
+    </div>
+  </section>
+
+  <section id="result" class="card hidden" aria-live="polite">
+    <h2 id="result-title">Your result</h2>
+    <p class="muted small" id="result-who"></p>
+    <div class="score" id="score"></div>
+    <div class="card noprint" style="background:var(--brand-soft);border-color:var(--brand)">
+      <h3 style="margin-top:0">3. Send your result to your teacher</h3>
+      <p class="small">Do <b>one</b> of these, then hand it in the way your teacher asked (e.g. Teams or Google Classroom assignment, or a message).</p>
+      <div class="row">
+        <button id="dl-result" type="button">Download my result file</button>
+        <button id="copy-code" type="button" class="secondary">Copy my result code</button>
+      </div>
+      <div id="code-wrap" class="hidden mt"><textarea id="code-box" readonly aria-label="Your result code"></textarea></div>
+      <div id="send-msg" class="msg hidden" role="status"></div>
+    </div>
+    <h3>Topic profile</h3>
+    <div class="legend"><span><i class="cell green"></i>70% or more</span><span><i class="cell amber"></i>40–69%</span><span><i class="cell red"></i>below 40%</span></div>
+    <div class="bars" id="topics"></div>
+    <h3>Your to-do list</h3>
+    <ul class="todo" id="todo"></ul>
+    <p class="muted small">The estimated grade uses recent AQA A-level Physics grade boundaries applied to this paper. It is a guide, not a prediction.</p>
+    <div class="row mt noprint">
+      <button id="edit" type="button" class="secondary">Change my marks</button>
+      <button id="another" type="button">Enter another paper</button>
+      <button id="print-result" type="button" class="ghost">Print</button>
+    </div>
+  </section>
+</div>
+
+<!-- ============================== TEACHER ============================== -->
+<div id="teacher" class="hidden">
+  <div class="tabs" id="ttabs" role="tablist">
+    <button type="button" role="tab" data-tab="dash" aria-selected="true">Dashboard</button>
+    <button type="button" role="tab" data-tab="add" aria-selected="false">Add results</button>
+    <button type="button" role="tab" data-tab="settings" aria-selected="false">Settings &amp; backup</button>
+  </div>
+
+  <div id="tab-dash">
+    <div class="toolbar">
+      <div class="pills" id="tpapers" role="group" aria-label="Paper"></div>
+      <div class="row noprint">
+        <label for="tclass" class="small">Class</label>
+        <select id="tclass"></select>
+        <button id="csv" type="button" class="secondary small">Download CSV</button>
+        <button id="tprint" type="button" class="ghost small">Print</button>
+        <button id="clear" type="button" class="danger small">Delete these results…</button>
+      </div>
+    </div>
+    <div id="empty" class="card hidden"><b>No results yet for this paper.</b> <span class="muted">Go to <i>Add results</i> to load the files or codes your students sent you, or type marks in yourself.</span></div>
+    <div class="card"><h2 id="dash-title">Overview</h2><div class="score" id="headline"></div><div class="grades" id="grade-dist"></div></div>
+    <div class="card"><h2>Students</h2><p class="muted small">Click a student to see their full result. Click a column heading to sort.</p><div class="tablewrap"><table id="students"></table></div></div>
+    <div class="card"><h2>Topic heat map</h2>
+      <div class="legend"><span><i class="cell green"></i>70%+</span><span><i class="cell amber"></i>40–69%</span><span><i class="cell red"></i>&lt;40%</span></div>
+      <div class="tablewrap heat"><table id="heat"></table></div></div>
+    <div class="card"><h2>Question analysis</h2><p class="muted small">Facility = average mark ÷ marks available. Sort by Facility to find what to re-teach.</p><div class="tablewrap"><table id="questions"></table></div></div>
+  </div>
+
+  <div id="tab-add" class="hidden">
+    <div class="grid2 mt">
+      <div class="card">
+        <h2>Result files</h2>
+        <p class="small muted">Drop the <code>.qla.json</code> files your students sent you. You can select many at once. A CSV from this page or a spreadsheet with a Student column and question columns (e.g. <code>Q01.1</code>) also works.</p>
+        <div class="drop" id="drop"><p><b>Drag and drop files here</b></p><p class="muted small">or</p>
+          <label class="btn" for="files" style="display:inline-flex;margin:0">Choose files</label>
+          <input id="files" type="file" multiple accept=".json,.csv,.txt,application/json,text/csv" class="hidden"></div>
+      </div>
+      <div class="card">
+        <h2>Result codes</h2>
+        <p class="small muted">Paste codes students sent you in messages. Paste as many as you like at once; each starts with <code>QLA1-</code>.</p>
+        <textarea id="codes" placeholder="QLA1-…"></textarea>
+        <div class="row mt"><button id="import-codes" type="button">Add these codes</button></div>
+      </div>
+      <div class="card">
+        <h2>Type marks in yourself</h2>
+        <label for="m-name">Student name</label><input id="m-name" type="text" maxlength="60">
+        <label for="m-class">Class</label><select id="m-class"></select>
+        <label for="m-paper">Paper</label><select id="m-paper"></select>
+        <div class="row mt"><button id="manual" type="button">Enter marks</button></div>
+        <div id="add-msg" class="msg hidden" role="status"></div>
+      </div>
+    </div>
+    <div id="import-log" class="mt" aria-live="polite"></div>
+    <p class="muted small mt">If the same student sends the same paper twice, the newer result replaces the older one.</p>
+  </div>
+
+  <div id="tab-settings" class="hidden">
+    <div class="card">
+      <h2>Grade boundaries (% of each paper)</h2>
+      <p class="muted small" id="bound-note"></p>
+      <div class="tablewrap"><table id="bounds" class="btable"></table></div>
+      <div class="row mt"><button id="save-bounds" type="button">Save boundaries</button><button id="reset-bounds" type="button" class="ghost">Reset to defaults</button></div>
+      <div id="bound-msg" class="msg hidden" role="status"></div>
+    </div>
+    <div class="card">
+      <h2>Where the results are kept</h2>
+      <p class="small">Results you add are saved <b>in this browser on this computer only</b>. They are not uploaded anywhere. Use the same browser each time, and download a backup now and then. You can move to another computer by opening this file there and dropping the backup into <i>Add results</i>.</p>
+      <div class="row"><button id="backup" type="button" class="secondary">Download backup</button></div>
+    </div>
+  </div>
+</div>
+
+<dialog id="dlg"><div class="dhead"><b id="dlg-title"></b><button id="dlg-close" type="button" class="ghost small">Close</button></div><div class="dbody" id="dlg-body"></div></dialog>
+</main>
+<script>window.BLUEPRINT = {"title": "Y13 A-level Physics Mock Exams", "subtitle": "AQA A-level Physics (7408) – mock Papers 1, 2 and 3 (Section A)", "papers": [{"id": "P1", "name": "Paper 1", "max": 85}, {"id": "P2", "name": "Paper 2", "max": 85}, {"id": "P3", "name": "Paper 3 (Section A)", "max": 45}], "topics": [{"code": "M", "spec": "3.1", "name": "Measurements and their errors"}, {"code": "PA", "spec": "3.2.1", "name": "Particles (constituents, decay, quarks, conservation)"}, {"code": "QP", "spec": "3.2.2", "name": "EM radiation and quantum phenomena"}, {"code": "WS", "spec": "3.3.1", "name": "Progressive and stationary waves"}, {"code": "WR", "spec": "3.3.2", "name": "Refraction, diffraction and interference"}, {"code": "FM", "spec": "3.4.1", "name": "Force, energy and momentum"}, {"code": "MT", "spec": "3.4.2", "name": "Materials"}, {"code": "EL", "spec": "3.5.1", "name": "Current electricity"}, {"code": "CM", "spec": "3.6.1.1", "name": "Circular motion"}, {"code": "SH", "spec": "3.6.1.2", "name": "Simple harmonic motion"}, {"code": "TH", "spec": "3.6.2.1", "name": "Thermal energy transfer"}, {"code": "IG", "spec": "3.6.2.2", "name": "Ideal gases and kinetic theory"}, {"code": "GF", "spec": "3.7.2", "name": "Gravitational fields and orbits"}, {"code": "EF", "spec": "3.7.3", "name": "Electric fields"}, {"code": "CP", "spec": "3.7.4", "name": "Capacitance"}, {"code": "SK", "spec": "Skills", "name": "Practical skills and data analysis"}], "questions": [{"paper": "P1", "label": "01.1", "q": "1", "part": "1", "topic": "PA", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2024 Q01"}, {"paper": "P1", "label": "01.2", "q": "1", "part": "2", "topic": "PA", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2024 Q01"}, {"paper": "P1", "label": "01.3", "q": "1", "part": "3", "topic": "PA", "marks": 2, "mcq": false, "ao": "AO1", "src": "P1 2024 Q01"}, {"paper": "P1", "label": "01.4", "q": "1", "part": "4", "topic": "PA", "marks": 3, "mcq": false, "ao": "AO1", "src": "P1 2024 Q01"}, {"paper": "P1", "label": "02.1", "q": "2", "part": "1", "topic": "QP", "marks": 2, "mcq": false, "ao": "AO2", "src": "P1 2025 Q08"}, {"paper": "P1", "label": "02.2", "q": "2", "part": "2", "topic": "QP", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2025 Q08"}, {"paper": "P1", "label": "02.3", "q": "2", "part": "3", "topic": "QP", "marks": 2, "mcq": false, "ao": "AO1 (1), AO3 (1)", "src": "P1 2025 Q08"}, {"paper": "P1", "label": "02.4", "q": "2", "part": "4", "topic": "QP", "marks": 3, "mcq": false, "ao": "AO1 (1), AO2 (2)", "src": "P1 2025 Q08"}, {"paper": "P1", "label": "03.1", "q": "3", "part": "1", "topic": "WS", "marks": 1, "mcq": false, "ao": "AO3", "src": "P1 2024 Q07"}, {"paper": "P1", "label": "03.2", "q": "3", "part": "2", "topic": "WS", "marks": 2, "mcq": false, "ao": "AO3", "src": "P1 2024 Q07"}, {"paper": "P1", "label": "03.3", "q": "3", "part": "3", "topic": "WS", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2024 Q07"}, {"paper": "P1", "label": "03.4", "q": "3", "part": "4", "topic": "WS", "marks": 3, "mcq": false, "ao": "AO3", "src": "P1 2024 Q07"}, {"paper": "P1", "label": "04.1", "q": "4", "part": "1", "topic": "WR", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2021 Q03"}, {"paper": "P1", "label": "04.2", "q": "4", "part": "2", "topic": "WR", "marks": 3, "mcq": false, "ao": "AO2", "src": "P1 2021 Q03"}, {"paper": "P1", "label": "04.3", "q": "4", "part": "3", "topic": "WR", "marks": 3, "mcq": false, "ao": "AO3", "src": "P1 2021 Q03"}, {"paper": "P1", "label": "05.1", "q": "5", "part": "1", "topic": "FM", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P1 2023 Q02"}, {"paper": "P1", "label": "05.2", "q": "5", "part": "2", "topic": "FM", "marks": 2, "mcq": false, "ao": "AO2 (1), AO3 (1)", "src": "P1 2023 Q02"}, {"paper": "P1", "label": "05.3", "q": "5", "part": "3", "topic": "FM", "marks": 4, "mcq": false, "ao": "AO1 (1), AO2 (1), AO3 (2)", "src": "P1 2023 Q02"}, {"paper": "P1", "label": "05.4", "q": "5", "part": "4", "topic": "FM", "marks": 2, "mcq": false, "ao": "AO3", "src": "P1 2023 Q02"}, {"paper": "P1", "label": "06.1", "q": "6", "part": "1", "topic": "MT", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2023 Q05"}, {"paper": "P1", "label": "06.2", "q": "6", "part": "2", "topic": "MT", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2023 Q05"}, {"paper": "P1", "label": "06.3", "q": "6", "part": "3", "topic": "MT", "marks": 3, "mcq": false, "ao": "AO1 (1), AO2 (2)", "src": "P1 2023 Q05"}, {"paper": "P1", "label": "06.4", "q": "6", "part": "4", "topic": "MT", "marks": 5, "mcq": false, "ao": "AO3", "src": "P1 2023 Q05"}, {"paper": "P1", "label": "07.1", "q": "7", "part": "1", "topic": "EL", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2022 Q04"}, {"paper": "P1", "label": "07.2", "q": "7", "part": "2", "topic": "EL", "marks": 3, "mcq": false, "ao": "AO2", "src": "P1 2022 Q04"}, {"paper": "P1", "label": "07.3", "q": "7", "part": "3", "topic": "EL", "marks": 3, "mcq": false, "ao": "AO2", "src": "P1 2022 Q04"}, {"paper": "P1", "label": "07.4", "q": "7", "part": "4", "topic": "EL", "marks": 2, "mcq": false, "ao": "AO3", "src": "P1 2022 Q04"}, {"paper": "P1", "label": "07.5", "q": "7", "part": "5", "topic": "EL", "marks": 2, "mcq": false, "ao": "AO3", "src": "P1 2022 Q04"}, {"paper": "P1", "label": "08", "q": "8", "part": "", "topic": "M", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2022 Q08"}, {"paper": "P1", "label": "09", "q": "9", "part": "", "topic": "M", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2022 Q07"}, {"paper": "P1", "label": "10", "q": "10", "part": "", "topic": "M", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q09"}, {"paper": "P1", "label": "11", "q": "11", "part": "", "topic": "PA", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q10"}, {"paper": "P1", "label": "12", "q": "12", "part": "", "topic": "PA", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2022 Q12"}, {"paper": "P1", "label": "13", "q": "13", "part": "", "topic": "PA", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q11"}, {"paper": "P1", "label": "14", "q": "14", "part": "", "topic": "PA", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2021 Q12"}, {"paper": "P1", "label": "15", "q": "15", "part": "", "topic": "QP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2023 Q12"}, {"paper": "P1", "label": "16", "q": "16", "part": "", "topic": "QP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q11"}, {"paper": "P1", "label": "17", "q": "17", "part": "", "topic": "QP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q17"}, {"paper": "P1", "label": "18", "q": "18", "part": "", "topic": "WR", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2020 Q14"}, {"paper": "P1", "label": "19", "q": "19", "part": "", "topic": "WS", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q19"}, {"paper": "P1", "label": "20", "q": "20", "part": "", "topic": "WR", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q17"}, {"paper": "P1", "label": "21", "q": "21", "part": "", "topic": "WR", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2021 Q19"}, {"paper": "P1", "label": "22", "q": "22", "part": "", "topic": "WS", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q15"}, {"paper": "P1", "label": "23", "q": "23", "part": "", "topic": "FM", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q20"}, {"paper": "P1", "label": "24", "q": "24", "part": "", "topic": "FM", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q24"}, {"paper": "P1", "label": "25", "q": "25", "part": "", "topic": "FM", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q19"}, {"paper": "P1", "label": "26", "q": "26", "part": "", "topic": "FM", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q19"}, {"paper": "P1", "label": "27", "q": "27", "part": "", "topic": "FM", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q23"}, {"paper": "P1", "label": "28", "q": "28", "part": "", "topic": "MT", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2021 Q26"}, {"paper": "P1", "label": "29", "q": "29", "part": "", "topic": "MT", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q25"}, {"paper": "P1", "label": "30", "q": "30", "part": "", "topic": "EL", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q30"}, {"paper": "P1", "label": "31", "q": "31", "part": "", "topic": "EL", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q27"}, {"paper": "P1", "label": "32", "q": "32", "part": "", "topic": "EL", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q21"}, {"paper": "P2", "label": "01.1", "q": "1", "part": "1", "topic": "CM", "marks": 2, "mcq": false, "ao": "AO1", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "01.2", "q": "1", "part": "2", "topic": "CM", "marks": 1, "mcq": false, "ao": "AO1", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "01.3", "q": "1", "part": "3", "topic": "CM", "marks": 2, "mcq": false, "ao": "AO2", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "01.4", "q": "1", "part": "4", "topic": "CM", "marks": 2, "mcq": false, "ao": "AO1", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "01.5", "q": "1", "part": "5", "topic": "SH", "marks": 2, "mcq": false, "ao": "AO1", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "01.6", "q": "1", "part": "6", "topic": "SH", "marks": 2, "mcq": false, "ao": "AO3", "src": "P1 2022 Q05"}, {"paper": "P2", "label": "02.1", "q": "2", "part": "1", "topic": "IG", "marks": 5, "mcq": false, "ao": "AO1 (2), AO2 (3)", "src": "P2 2023 Q02"}, {"paper": "P2", "label": "02.2", "q": "2", "part": "2", "topic": "IG", "marks": 2, "mcq": false, "ao": "AO2", "src": "P2 2023 Q02"}, {"paper": "P2", "label": "03.1", "q": "3", "part": "1", "topic": "IG", "marks": 1, "mcq": false, "ao": "AO1", "src": "P2 2024 Q01"}, {"paper": "P2", "label": "03.2", "q": "3", "part": "2", "topic": "IG", "marks": 3, "mcq": false, "ao": "AO2", "src": "P2 2024 Q01"}, {"paper": "P2", "label": "03.3", "q": "3", "part": "3", "topic": "IG", "marks": 2, "mcq": false, "ao": "AO2", "src": "P2 2024 Q01"}, {"paper": "P2", "label": "03.4", "q": "3", "part": "4", "topic": "TH", "marks": 3, "mcq": false, "ao": "AO2 (2), AO3 (1)", "src": "P2 2024 Q01"}, {"paper": "P2", "label": "04.1", "q": "4", "part": "1", "topic": "GF", "marks": 3, "mcq": false, "ao": "AO1", "src": "P2 2020 Q02"}, {"paper": "P2", "label": "04.2", "q": "4", "part": "2", "topic": "GF", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P2 2020 Q02"}, {"paper": "P2", "label": "04.3", "q": "4", "part": "3", "topic": "GF", "marks": 3, "mcq": false, "ao": "AO2", "src": "P2 2020 Q02"}, {"paper": "P2", "label": "04.4", "q": "4", "part": "4", "topic": "GF", "marks": 3, "mcq": false, "ao": "AO2 (1), AO3 (2)", "src": "P2 2020 Q02"}, {"paper": "P2", "label": "04.5", "q": "4", "part": "5", "topic": "GF", "marks": 3, "mcq": false, "ao": "AO2", "src": "P2 2020 Q02"}, {"paper": "P2", "label": "05.1", "q": "5", "part": "1", "topic": "EF", "marks": 2, "mcq": false, "ao": "AO2", "src": "P2 2018 Q02"}, {"paper": "P2", "label": "05.2", "q": "5", "part": "2", "topic": "EF", "marks": 3, "mcq": false, "ao": "AO3", "src": "P2 2018 Q02"}, {"paper": "P2", "label": "05.3", "q": "5", "part": "3", "topic": "EF", "marks": 2, "mcq": false, "ao": "AO1 (1), AO3 (1)", "src": "P2 2018 Q02"}, {"paper": "P2", "label": "05.4", "q": "5", "part": "4", "topic": "EF", "marks": 2, "mcq": false, "ao": "AO1", "src": "P2 2018 Q02"}, {"paper": "P2", "label": "06.1", "q": "6", "part": "1", "topic": "CP", "marks": 3, "mcq": false, "ao": "AO1 (1), AO2 (2)", "src": "P2 2023 Q05"}, {"paper": "P2", "label": "06.2", "q": "6", "part": "2", "topic": "CP", "marks": 4, "mcq": false, "ao": "AO2 (3), AO3 (1)", "src": "P2 2023 Q05"}, {"paper": "P2", "label": "06.3", "q": "6", "part": "3", "topic": "CP", "marks": 3, "mcq": false, "ao": "AO3", "src": "P2 2023 Q05"}, {"paper": "P2", "label": "07", "q": "7", "part": "", "topic": "M", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2021 Q08"}, {"paper": "P2", "label": "08", "q": "8", "part": "", "topic": "M", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2025 Q11"}, {"paper": "P2", "label": "09", "q": "9", "part": "", "topic": "CM", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q29"}, {"paper": "P2", "label": "10", "q": "10", "part": "", "topic": "CM", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2023 Q30"}, {"paper": "P2", "label": "11", "q": "11", "part": "", "topic": "SH", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2024 Q30"}, {"paper": "P2", "label": "12", "q": "12", "part": "", "topic": "SH", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2022 Q31"}, {"paper": "P2", "label": "13", "q": "13", "part": "", "topic": "SH", "marks": 1, "mcq": true, "ao": "AO1", "src": "P1 2023 Q31"}, {"paper": "P2", "label": "14", "q": "14", "part": "", "topic": "SH", "marks": 1, "mcq": true, "ao": "AO2", "src": "P1 2021 Q30"}, {"paper": "P2", "label": "15", "q": "15", "part": "", "topic": "TH", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2021 Q07"}, {"paper": "P2", "label": "16", "q": "16", "part": "", "topic": "IG", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2022 Q07"}, {"paper": "P2", "label": "17", "q": "17", "part": "", "topic": "IG", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2025 Q10"}, {"paper": "P2", "label": "18", "q": "18", "part": "", "topic": "IG", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2022 Q08"}, {"paper": "P2", "label": "19", "q": "19", "part": "", "topic": "IG", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2023 Q09"}, {"paper": "P2", "label": "20", "q": "20", "part": "", "topic": "IG", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2024 Q08"}, {"paper": "P2", "label": "21", "q": "21", "part": "", "topic": "GF", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2021 Q12"}, {"paper": "P2", "label": "22", "q": "22", "part": "", "topic": "GF", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2022 Q13"}, {"paper": "P2", "label": "23", "q": "23", "part": "", "topic": "GF", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2021 Q13"}, {"paper": "P2", "label": "24", "q": "24", "part": "", "topic": "GF", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2023 Q13"}, {"paper": "P2", "label": "25", "q": "25", "part": "", "topic": "EF", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2025 Q13"}, {"paper": "P2", "label": "26", "q": "26", "part": "", "topic": "EF", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2021 Q15"}, {"paper": "P2", "label": "27", "q": "27", "part": "", "topic": "EF", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2022 Q16"}, {"paper": "P2", "label": "28", "q": "28", "part": "", "topic": "EF", "marks": 1, "mcq": true, "ao": "AO1", "src": "P2 2025 Q14"}, {"paper": "P2", "label": "29", "q": "29", "part": "", "topic": "CP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2022 Q21"}, {"paper": "P2", "label": "30", "q": "30", "part": "", "topic": "CP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2025 Q17"}, {"paper": "P2", "label": "31", "q": "31", "part": "", "topic": "CP", "marks": 1, "mcq": true, "ao": "AO2", "src": "P2 2022 Q20"}, {"paper": "P3", "label": "01.1", "q": "1", "part": "1", "topic": "WR", "marks": 3, "mcq": false, "ao": "AO1 (1), AO2 (1), AO3 (1)", "src": "P3 2021 Q02"}, {"paper": "P3", "label": "01.2", "q": "1", "part": "2", "topic": "SK", "marks": 1, "mcq": false, "ao": "AO1", "src": "P3 2021 Q02"}, {"paper": "P3", "label": "01.3", "q": "1", "part": "3", "topic": "SK", "marks": 2, "mcq": false, "ao": "AO1 (1), AO3 (1)", "src": "P3 2021 Q02"}, {"paper": "P3", "label": "01.4", "q": "1", "part": "4", "topic": "QP", "marks": 2, "mcq": false, "ao": "AO1", "src": "P3 2021 Q02"}, {"paper": "P3", "label": "01.5", "q": "1", "part": "5", "topic": "EL", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P3 2021 Q02"}, {"paper": "P3", "label": "02.1", "q": "2", "part": "1", "topic": "SK", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.2", "q": "2", "part": "2", "topic": "IG", "marks": 3, "mcq": false, "ao": "AO3", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.3", "q": "2", "part": "3", "topic": "SK", "marks": 4, "mcq": false, "ao": "AO1 (1), AO2 (2), AO3 (1)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.4", "q": "2", "part": "4", "topic": "M", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.5", "q": "2", "part": "5", "topic": "IG", "marks": 3, "mcq": false, "ao": "AO2 (1), AO3 (2)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.6", "q": "2", "part": "6", "topic": "SK", "marks": 3, "mcq": false, "ao": "AO2 (1), AO3 (2)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "02.7", "q": "2", "part": "7", "topic": "IG", "marks": 2, "mcq": false, "ao": "AO1 (1), AO2 (1)", "src": "P3 2022 Q04"}, {"paper": "P3", "label": "03.1", "q": "3", "part": "1", "topic": "SK", "marks": 2, "mcq": false, "ao": "AO3", "src": "P3 2023 Q02"}, {"paper": "P3", "label": "03.2", "q": "3", "part": "2", "topic": "SK", "marks": 2, "mcq": false, "ao": "AO1", "src": "P3 2023 Q02"}, {"paper": "P3", "label": "03.3", "q": "3", "part": "3", "topic": "EL", "marks": 4, "mcq": false, "ao": "AO1 (2), AO3 (2)", "src": "P3 2023 Q02"}, {"paper": "P3", "label": "03.4", "q": "3", "part": "4", "topic": "EL", "marks": 3, "mcq": false, "ao": "AO2", "src": "P3 2023 Q02"}, {"paper": "P3", "label": "03.5", "q": "3", "part": "5", "topic": "SK", "marks": 3, "mcq": false, "ao": "AO1 (2), AO2 (1)", "src": "P3 2023 Q02"}, {"paper": "P3", "label": "03.6", "q": "3", "part": "6", "topic": "EL", "marks": 2, "mcq": false, "ao": "AO3", "src": "P3 2023 Q02"}], "defaultBoundaries": [{"grade": "A*", "pct": 70}, {"grade": "A", "pct": 56}, {"grade": "B", "pct": 47}, {"grade": "C", "pct": 37}, {"grade": "D", "pct": 28}, {"grade": "E", "pct": 18}], "boundaryNote": "Default boundaries are the 2023–2025 average of AQA 7408 whole-qualification boundaries (out of 250), applied to each paper as an estimate."};</script>
+<script>
+(function () {
+  'use strict';
+  var BP = window.BLUEPRINT;
+  var CLASSES = ['13A2', '13A4'];
+  var LS_RECORDS = 'y13qla-records-v1', LS_BOUNDS = 'y13qla-bounds-v1', LS_ME = 'y13qla-me', LS_DRAFT = 'y13qla-draft-';
+  var $ = function (id) { return document.getElementById(id); };
+  var topicByCode = {}; BP.topics.forEach(function (t) { topicByCode[t.code] = t; });
+
+  // ------------------------------------------------------------ helpers
+  function el(tag, attrs, children) {
+    var n = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      var v = attrs[k];
+      if (v === undefined || v === null || v === false) return;
+      if (k === 'text') n.textContent = String(v);
+      else if (k === 'class') n.className = v;
+      else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), v);
+      else if (k === 'style') Object.assign(n.style, v);
+      else n.setAttribute(k, v === true ? '' : String(v));
+    });
+    (children || []).forEach(function (c) {
+      if (c === null || c === undefined || c === false) return;
+      n.appendChild(typeof c === 'string' || typeof c === 'number' ? document.createTextNode(String(c)) : c);
+    });
+    return n;
+  }
+  function clear(n) { while (n.firstChild) n.removeChild(n.firstChild); return n; }
+  function show(n, on) { n.classList.toggle('hidden', !on); }
+  function msg(n, text, kind) { n.textContent = text || ''; n.className = 'msg ' + (kind || 'error') + (text ? '' : ' hidden'); }
+  function load(key, fallback) { try { var v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; } }
+  function save(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch (e) { return false; } }
+  function round1(x) { return Math.round(x * 10) / 10; }
+  function rag(p) { return p >= 70 ? 'green' : p >= 40 ? 'amber' : 'red'; }
+  function paperById(id) { return BP.papers.find(function (p) { return p.id === id; }); }
+  function questionsFor(paper) { return BP.questions.filter(function (q) { return q.paper === paper; }); }
+  function download(filename, text, type) {
+    var blob = new Blob([text], { type: type || 'application/octet-stream' });
+    var a = el('a', { href: URL.createObjectURL(blob), download: filename });
+    document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+  function safeName(s) { return String(s).replace(/[^A-Za-z0-9 _-]/g, '').trim().replace(/\s+/g, '-') || 'student'; }
+  function cleanName(v) {
+    if (typeof v !== 'string') return null;
+    var s = v.replace(/[\u0000-\u001f\u007f<>]/g, '').replace(/\s+/g, ' ').trim();
+    return s.length >= 2 && s.length <= 60 ? s : null;
+  }
+  function bar(name, sub, pct, r, valText) {
+    return el('div', { class: 'bar' }, [
+      el('div', { class: 'name' }, [name, sub ? el('small', { text: sub }) : null]),
+      el('div', { class: 'track' }, [el('div', { class: 'fill ' + r, style: { width: Math.max(2, Math.min(100, pct)) + '%' } })]),
+      el('div', { class: 'val', text: valText }),
+    ]);
+  }
+
+  // ------------------------------------------------------------ marking (mirrors the AQA mark totals)
+  function defaultBounds() { var b = {}; BP.papers.forEach(function (p) { b[p.id] = BP.defaultBoundaries.map(function (x) { return { grade: x.grade, pct: x.pct }; }); }); return b; }
+  function getBounds() {
+    var b = load(LS_BOUNDS, null);
+    if (!b) return defaultBounds();
+    var ok = BP.papers.every(function (p) { return Array.isArray(b[p.id]) && b[p.id].length === BP.defaultBoundaries.length; });
+    return ok ? b : defaultBounds();
+  }
+  function gradeFor(pct, bounds) { for (var i = 0; i < bounds.length; i++) if (pct >= bounds[i].pct) return bounds[i].grade; return 'U'; }
+
+  function validateMarks(paper, raw) {
+    if (!paperById(paper)) return 'Unknown paper.';
+    if (!raw || typeof raw !== 'object') return 'Marks missing.';
+    var out = {}, qs = questionsFor(paper);
+    for (var i = 0; i < qs.length; i++) {
+      var q = qs[i], v = raw[q.label];
+      if (v === undefined || v === null || v === '') return 'No mark for question ' + q.label + '.';
+      var n = Number(v);
+      if (!Number.isInteger(n) || n < 0 || n > q.marks) return 'Question ' + q.label + ': mark must be 0 to ' + q.marks + '.';
+      out[q.label] = n;
+    }
+    return out;
+  }
+
+  function analyse(paper, marks) {
+    var p = paperById(paper), qs = questionsFor(paper), total = 0, t = {};
+    qs.forEach(function (q) {
+      var got = marks[q.label] || 0; total += got;
+      if (!t[q.topic]) t[q.topic] = { got: 0, max: 0 };
+      t[q.topic].got += got; t[q.topic].max += q.marks;
+    });
+    var pct = round1((100 * total) / p.max);
+    var topics = BP.topics.filter(function (tp) { return t[tp.code]; }).map(function (tp) {
+      var e = t[tp.code], tpct = round1((100 * e.got) / e.max);
+      return { code: tp.code, spec: tp.spec, name: tp.name, got: e.got, max: e.max, pct: tpct, rag: rag(tpct) };
+    });
+    return { paper: paper, paperName: p.name, total: total, max: p.max, pct: pct, grade: gradeFor(pct, getBounds()[paper]), topics: topics, todo: buildTodo(qs, marks, topics) };
+  }
+
+  function buildTodo(qs, marks, topics) {
+    var todo = [];
+    topics.filter(function (t) { return t.pct < 70; }).sort(function (a, b) { return a.pct - b.pct; }).slice(0, 4).forEach(function (t) {
+      todo.push({ text: 'Revise ' + t.name, detail: 'Spec ' + t.spec + ': you scored ' + t.got + '/' + t.max + ' (' + t.pct + '%).' + (t.rag === 'red' ? ' Priority topic.' : '') });
+    });
+    qs.map(function (q) { return { q: q, lost: q.marks - (marks[q.label] || 0) }; })
+      .filter(function (x) { return x.lost > 0 && !x.q.mcq; })
+      .sort(function (a, b) { return b.lost - a.lost || b.q.marks - a.q.marks; })
+      .slice(0, 6)
+      .forEach(function (x) {
+        todo.push({ text: 'Redo question ' + x.q.label, detail: 'You dropped ' + x.lost + ' of ' + x.q.marks + ' mark' + (x.q.marks === 1 ? '' : 's') + ' (' + topicByCode[x.q.topic].name + '). Check it against the mark scheme.' });
+      });
+    var wrong = qs.filter(function (q) { return q.mcq && (marks[q.label] || 0) === 0; }).map(function (q) { return q.label; });
+    if (wrong.length) todo.push({ text: 'Review the multiple-choice questions you got wrong', detail: 'Questions ' + wrong.join(', ') + '. Work out why the correct answer is right.' });
+    return todo;
+  }
+
+  // ------------------------------------------------------------ result files and codes
+  function encodeResult(rec) {
+    var json = JSON.stringify({ app: 'y13-physics-qla', v: 1, paper: rec.paper, name: rec.name, className: rec.className, marks: rec.marks, saved: rec.saved });
+    return 'QLA1-' + btoa(unescape(encodeURIComponent(json))).replace(/=+$/, '');
+  }
+  function parseResultObject(o) {
+    if (!o || o.app !== 'y13-physics-qla') return 'This is not a result from this mock analysis.';
+    var name = cleanName(o.name);
+    if (!name) return 'The student name is missing.';
+    if (CLASSES.indexOf(o.className) < 0 && !(typeof o.className === 'string' && o.className.length <= 30)) return 'Unknown class.';
+    var marks = validateMarks(o.paper, o.marks);
+    if (typeof marks === 'string') return marks;
+    return { paper: o.paper, name: name, className: String(o.className).slice(0, 30), marks: marks, saved: typeof o.saved === 'string' ? o.saved : new Date().toISOString() };
+  }
+  function decodeResult(code) {
+    var m = String(code).trim().match(/QLA1-([A-Za-z0-9+/]+)/);
+    if (!m) return 'Not a result code.';
+    try {
+      var b = m[1]; while (b.length % 4) b += '=';
+      return parseResultObject(JSON.parse(decodeURIComponent(escape(atob(b)))));
+    } catch (e) { return 'This code is damaged or incomplete. Ask the student to copy it again.'; }
+  }
+
+  // ------------------------------------------------------------ mode switch
+  function setMode(m) {
+    show($('student'), m === 'student'); show($('teacher'), m === 'teacher');
+    Array.prototype.forEach.call(document.querySelectorAll('#modes button'), function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-mode') === m ? 'true' : 'false'); });
+    if (m === 'teacher') renderTeacher();
+    window.scrollTo(0, 0);
+  }
+
+  // ================================================================= STUDENT
+  var S = { paper: null, name: '', className: '', marks: {}, entryFor: 'student' };
+
+  function initStudent() {
+    BP.papers.forEach(function (p) {
+      $('papers').appendChild(el('button', { type: 'button', class: 'choice', 'aria-pressed': 'false', 'data-id': p.id, onclick: function () { S.paper = p.id; paintPapers(); } },
+        [el('b', { text: p.name }), el('span', { class: 'muted small', text: p.max + ' marks' })]));
+    });
+    CLASSES.forEach(function (c) { $('class').appendChild(el('option', { value: c, text: c })); });
+    var me = load(LS_ME, null); if (me) { $('name').value = me.name || ''; $('class').value = me.className || ''; }
+    $('continue').addEventListener('click', startEntry);
+    $('back').addEventListener('click', function () { show($('entry'), false); show(S.entryFor === 'student' ? $('start') : $('teacher'), true); if (S.entryFor === 'teacher') { show($('student'), false); } });
+    $('submit').addEventListener('click', submitMarks);
+    $('edit').addEventListener('click', function () { show($('result'), false); show($('entry'), true); window.scrollTo(0, 0); });
+    $('another').addEventListener('click', function () { show($('result'), false); show($('start'), true); S.paper = null; paintPapers(); window.scrollTo(0, 0); });
+    $('print-result').addEventListener('click', function () { window.print(); });
+    $('dl-result').addEventListener('click', function () {
+      download('QLA-' + S.paper + '-' + safeName(S.className) + '-' + safeName(S.name) + '.qla.json', JSON.stringify(JSON.parse(atobJson(encodeResult(lastRecord()))), null, 1), 'application/json');
+      msg($('send-msg'), 'Downloaded. Now send this file to your teacher (e.g. attach it to the Teams/Classroom assignment).', 'ok');
+    });
+    $('copy-code').addEventListener('click', function () {
+      var code = encodeResult(lastRecord());
+      $('code-box').value = code; show($('code-wrap'), true);
+      (navigator.clipboard && navigator.clipboard.writeText ? navigator.clipboard.writeText(code) : Promise.reject()).then(function () {
+        msg($('send-msg'), 'Code copied. Paste it into a message to your teacher.', 'ok');
+      }).catch(function () { $('code-box').select(); msg($('send-msg'), 'Select the code in the box and copy it, then paste it into a message to your teacher.', 'ok'); });
+    });
+  }
+  function atobJson(code) { var b = code.slice(5); while (b.length % 4) b += '='; return decodeURIComponent(escape(atob(b))); }
+  function paintPapers() { Array.prototype.forEach.call($('papers').children, function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-id') === S.paper ? 'true' : 'false'); }); }
+  function lastRecord() { return { paper: S.paper, name: S.name, className: S.className, marks: S.marks, saved: S.saved }; }
+
+  function startEntry() {
+    var m = $('start-msg'), name = cleanName($('name').value), cls = $('class').value;
+    if (!S.paper) return msg(m, 'Please choose which paper you are entering marks for.');
+    if (!name) return msg(m, 'Please enter your full name.');
+    if (!cls) return msg(m, 'Please choose your class.');
+    msg(m, ''); S.name = name; S.className = cls; S.entryFor = 'student';
+    save(LS_ME, { name: name, className: cls });
+    S.marks = load(LS_DRAFT + S.paper, {}) || {};
+    buildForm();
+    show($('start'), false); show($('entry'), true); window.scrollTo(0, 0);
+  }
+
+  function buildForm() {
+    var p = paperById(S.paper);
+    $('entry-title').textContent = (S.entryFor === 'teacher' ? 'Enter marks for ' + S.name + ' (' + S.className + ') – ' : '2. Enter your marks – ') + p.name;
+    $('paper-max').textContent = p.max;
+    $('submit').textContent = S.entryFor === 'teacher' ? 'Save to class results' : 'See my result';
+    var qs = questionsFor(S.paper), form = clear($('form'));
+    var written = qs.filter(function (q) { return !q.mcq; }), mcq = qs.filter(function (q) { return q.mcq; });
+    if (written.length) {
+      form.appendChild(el('h3', { text: mcq.length ? 'Section A – written questions' : 'Questions' }));
+      var groups = {}, order = [];
+      written.forEach(function (q) { if (!groups[q.q]) { groups[q.q] = []; order.push(q.q); } groups[q.q].push(q); });
+      order.forEach(function (n) {
+        var g = el('div', { class: 'qgroup' }, [el('h4', { text: 'Question ' + n })]);
+        groups[n].forEach(function (q) { g.appendChild(writtenRow(q)); });
+        form.appendChild(g);
+      });
+    }
+    if (mcq.length) {
+      form.appendChild(el('h3', { text: 'Section B – multiple choice (1 mark each)' }));
+      var g2 = el('div', { class: 'qgroup' });
+      mcq.forEach(function (q) { g2.appendChild(mcqRow(q)); });
+      form.appendChild(g2);
+    }
+    updateTotal();
+  }
+  function saveDraft() { if (S.entryFor === 'student') save(LS_DRAFT + S.paper, S.marks); }
+  function writtenRow(q) {
+    var input = el('input', { type: 'number', inputmode: 'numeric', min: 0, max: q.marks, step: 1, id: 'm-' + q.label, 'aria-label': 'Mark for question ' + q.label });
+    if (S.marks[q.label] !== undefined) input.value = S.marks[q.label];
+    input.addEventListener('input', function () {
+      var v = input.value.trim(), n = Number(v), ok = v === '' || (Number.isInteger(n) && n >= 0 && n <= q.marks);
+      input.classList.toggle('bad', !ok);
+      if (v === '' || !ok) delete S.marks[q.label]; else S.marks[q.label] = n;
+      saveDraft(); updateTotal();
+    });
+    return el('div', { class: 'qrow' }, [el('div', { class: 'lab', text: q.label }), el('div', { class: 'topic', text: topicByCode[q.topic].name }),
+      el('div', { class: 'entry' }, [input, el('span', { class: 'muted', text: '/ ' + q.marks })])]);
+  }
+  function mcqRow(q) {
+    var wrong = el('button', { type: 'button', class: 'wrong', 'aria-label': 'Question ' + q.label + ' wrong', text: '✗ 0' });
+    var right = el('button', { type: 'button', class: 'right', 'aria-label': 'Question ' + q.label + ' right', text: '✓ 1' });
+    function paint() { wrong.setAttribute('aria-pressed', S.marks[q.label] === 0 ? 'true' : 'false'); right.setAttribute('aria-pressed', S.marks[q.label] === 1 ? 'true' : 'false'); }
+    wrong.addEventListener('click', function () { S.marks[q.label] = 0; paint(); saveDraft(); updateTotal(); });
+    right.addEventListener('click', function () { S.marks[q.label] = 1; paint(); saveDraft(); updateTotal(); });
+    paint();
+    return el('div', { class: 'qrow' }, [el('div', { class: 'lab', text: q.label }), el('div', { class: 'topic', text: topicByCode[q.topic].name }),
+      el('div', { class: 'entry' }, [el('span', { class: 'seg', id: 'm-' + q.label }, [wrong, right])])]);
+  }
+  function updateTotal() {
+    var qs = questionsFor(S.paper), t = 0, n = 0;
+    qs.forEach(function (q) { if (S.marks[q.label] !== undefined) { t += S.marks[q.label]; n++; } });
+    $('running').textContent = t; $('filled').textContent = '(' + n + ' of ' + qs.length + ' entered)';
+  }
+  function submitMarks() {
+    var qs = questionsFor(S.paper), missing = qs.filter(function (q) { return S.marks[q.label] === undefined; });
+    if (missing.length) {
+      msg($('entry-msg'), 'Please enter a mark for every question. Missing: ' + missing.slice(0, 8).map(function (q) { return q.label; }).join(', ') + (missing.length > 8 ? '…' : '') + '. Enter 0 if no marks were scored.');
+      var f = document.getElementById('m-' + missing[0].label); if (f) f.scrollIntoView({ block: 'center' });
+      return;
+    }
+    msg($('entry-msg'), '');
+    S.saved = new Date().toISOString();
+    if (S.entryFor === 'teacher') {
+      upsert({ paper: S.paper, name: S.name, className: S.className, marks: Object.assign({}, S.marks), saved: S.saved });
+      show($('entry'), false); show($('student'), false); setMode('teacher'); teacherTab('dash'); setTPaper(S.paper);
+      msg($('add-msg'), 'Saved ' + S.name + '.', 'ok');
+      return;
+    }
+    showResult(analyse(S.paper, S.marks));
+  }
+  function showResult(res) {
+    $('result-title').textContent = 'Your result – ' + res.paperName;
+    $('result-who').textContent = S.name + ' • ' + S.className;
+    var s = clear($('score'));
+    [[res.total + ' / ' + res.max, 'Marks'], [res.pct + '%', 'Percentage'], [res.grade, 'Estimated grade']].forEach(function (x) {
+      s.appendChild(el('div', { class: 'stat' }, [el('div', { class: 'v', text: x[0] }), el('div', { class: 'k', text: x[1] })]));
+    });
+    var t = clear($('topics'));
+    res.topics.forEach(function (tp) { t.appendChild(bar(tp.name, 'Spec ' + tp.spec, tp.pct, tp.rag, tp.got + '/' + tp.max + ' • ' + Math.round(tp.pct) + '%')); });
+    var todo = clear($('todo'));
+    if (!res.todo.length) todo.appendChild(el('li', {}, [el('div', { class: 'box' }), el('div', {}, [el('b', { text: 'Excellent work!' }), el('span', { text: 'No significant marks dropped. Try some harder past-paper questions.' })])]));
+    res.todo.forEach(function (it) { todo.appendChild(el('li', {}, [el('div', { class: 'box' }), el('div', {}, [el('b', { text: it.text }), el('span', { text: it.detail })])])); });
+    msg($('send-msg'), ''); show($('code-wrap'), false);
+    show($('entry'), false); show($('result'), true); window.scrollTo(0, 0);
+  }
+
+  // ================================================================= TEACHER (data stays in this browser)
+  var T = { paper: BP.papers[0].id, cls: 'all', sort: { students: { key: 'name', dir: 1 }, questions: { key: 'label', dir: 1 } } };
+  function records() { return load(LS_RECORDS, {}) || {}; }
+  function keyOf(r) { return r.paper + '|' + r.className + '|' + r.name.toLowerCase(); }
+  function upsert(r) {
+    var all = records(), k = keyOf(r), existed = !!all[k];
+    if (existed && all[k].saved > r.saved) return 'older';
+    all[k] = r;
+    if (!save(LS_RECORDS, all)) { alert('Could not save in this browser. Use "Download backup" to keep your data.'); }
+    return existed ? 'updated' : 'added';
+  }
+  function classesInData() {
+    var set = {}; CLASSES.forEach(function (c) { set[c] = true; });
+    Object.keys(records()).forEach(function (k) { set[records()[k].className] = true; });
+    return Object.keys(set).sort();
+  }
+
+  function initTeacher() {
+    Array.prototype.forEach.call(document.querySelectorAll('#ttabs button'), function (b) { b.addEventListener('click', function () { teacherTab(b.getAttribute('data-tab')); }); });
+    BP.papers.forEach(function (p) { $('tpapers').appendChild(el('button', { type: 'button', 'data-id': p.id, text: p.name, onclick: function () { setTPaper(p.id); } })); });
+    $('tclass').addEventListener('change', function () { T.cls = $('tclass').value; renderTeacher(); });
+    $('csv').addEventListener('click', downloadCsv);
+    $('tprint').addEventListener('click', function () { window.print(); });
+    $('clear').addEventListener('click', clearPaperClass);
+    $('files').addEventListener('change', function () { importFiles($('files').files); $('files').value = ''; });
+    var dz = $('drop');
+    ['dragenter', 'dragover'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.add('over'); }); });
+    ['dragleave', 'drop'].forEach(function (ev) { dz.addEventListener(ev, function (e) { e.preventDefault(); dz.classList.remove('over'); }); });
+    dz.addEventListener('drop', function (e) { importFiles(e.dataTransfer.files); });
+    $('import-codes').addEventListener('click', importCodes);
+    $('manual').addEventListener('click', manualEntry);
+    CLASSES.forEach(function (c) { $('m-class').appendChild(el('option', { value: c, text: c })); });
+    BP.papers.forEach(function (p) { $('m-paper').appendChild(el('option', { value: p.id, text: p.name })); });
+    $('backup').addEventListener('click', function () { download('QLA-backup-' + new Date().toISOString().slice(0, 10) + '.qla-backup.json', JSON.stringify({ app: 'y13-physics-qla-backup', records: records(), bounds: getBounds() }, null, 1), 'application/json'); });
+    $('save-bounds').addEventListener('click', saveBounds);
+    $('reset-bounds').addEventListener('click', function () { try { localStorage.removeItem(LS_BOUNDS); } catch (e) {} renderBounds(); msg($('bound-msg'), 'Reset to defaults.', 'ok'); });
+    $('dlg-close').addEventListener('click', function () { $('dlg').close(); });
+  }
+  function teacherTab(name) {
+    ['dash', 'add', 'settings'].forEach(function (t) { show($('tab-' + t), t === name); });
+    Array.prototype.forEach.call(document.querySelectorAll('#ttabs button'), function (b) { b.setAttribute('aria-selected', b.getAttribute('data-tab') === name ? 'true' : 'false'); });
+    if (name === 'dash') renderTeacher();
+    if (name === 'settings') renderBounds();
+  }
+  function setTPaper(id) { T.paper = id; renderTeacher(); }
+
+  function current() {
+    var all = records();
+    return Object.keys(all).map(function (k) { return all[k]; })
+      .filter(function (r) { return r.paper === T.paper && (T.cls === 'all' || r.className === T.cls) && typeof validateMarks(r.paper, r.marks) !== 'string'; })
+      .map(function (r) { return { rec: r, res: analyse(r.paper, r.marks) }; });
+  }
+
+  function renderTeacher() {
+    Array.prototype.forEach.call($('tpapers').children, function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-id') === T.paper ? 'true' : 'false'); });
+    var sel = clear($('tclass'));
+    sel.appendChild(el('option', { value: 'all', text: 'All classes' }));
+    classesInData().forEach(function (c) { sel.appendChild(el('option', { value: c, text: c })); });
+    sel.value = T.cls;
+    var rows = current(), p = paperById(T.paper);
+    $('dash-title').textContent = p.name + ' – ' + (T.cls === 'all' ? 'all classes' : T.cls);
+    var h = clear($('headline'));
+    var avgP = rows.length ? round1(rows.reduce(function (a, r) { return a + r.res.pct; }, 0) / rows.length) : 0;
+    var avgM = rows.length ? round1(rows.reduce(function (a, r) { return a + r.res.total; }, 0) / rows.length) : 0;
+    [[String(rows.length), 'Students'], [rows.length ? avgP + '%' : '–', 'Average percentage'], [rows.length ? avgM + ' / ' + p.max : '–', 'Average mark']].forEach(function (x) {
+      h.appendChild(el('div', { class: 'stat' }, [el('div', { class: 'v', text: x[0] }), el('div', { class: 'k', text: x[1] })]));
+    });
+    var gd = clear($('grade-dist'));
+    gd.appendChild(el('b', { class: 'small', text: 'Grade distribution:' }));
+    getBounds()[T.paper].map(function (b) { return b.grade; }).concat(['U']).forEach(function (g) {
+      gd.appendChild(el('span', { text: g + ': ' + rows.filter(function (r) { return r.res.grade === g; }).length }));
+    });
+    show($('empty'), !rows.length);
+    $('clear').disabled = !rows.length;
+    renderStudents(rows); renderHeat(rows); renderQuestions(rows);
+  }
+
+  function sortRows(rows, state, getters) {
+    var g = getters[state.key];
+    return rows.slice().sort(function (a, b) { var x = g(a), y = g(b); return typeof x === 'string' ? state.dir * x.localeCompare(y) : state.dir * (x - y); });
+  }
+  function headerRow(name, cols, rows, rerender) {
+    return el('tr', {}, cols.map(function (c) {
+      var th = el('th', { class: (c.sort ? 'sortable ' : '') + (c.num ? 'num' : ''), text: c.label });
+      if (c.sort) th.addEventListener('click', function () { var s = T.sort[name]; if (s.key === c.sort) s.dir = -s.dir; else { s.key = c.sort; s.dir = c.num ? -1 : 1; } rerender(rows); });
+      return th;
+    }));
+  }
+  function renderStudents(rows) {
+    var t = clear($('students'));
+    var cols = [{ label: 'Student', sort: 'name' }, { label: 'Class', sort: 'cls' }, { label: 'Mark', sort: 'total', num: true }, { label: '%', sort: 'pct', num: true },
+      { label: 'Grade', sort: 'pct', num: true }, { label: '' }];
+    t.appendChild(el('thead', {}, [headerRow('students', cols, rows, renderStudents)]));
+    var tb = el('tbody');
+    sortRows(rows, T.sort.students, { name: function (r) { return r.rec.name; }, cls: function (r) { return r.rec.className; }, total: function (r) { return r.res.total; }, pct: function (r) { return r.res.pct; } })
+      .forEach(function (r) {
+        var del = el('button', { type: 'button', class: 'ghost small noprint', text: 'Delete' });
+        del.addEventListener('click', function (e) {
+          e.stopPropagation();
+          if (!confirm('Delete ' + r.rec.name + '’s ' + r.res.paperName + ' result from this computer?')) return;
+          var all = records(); delete all[keyOf(r.rec)]; save(LS_RECORDS, all); renderTeacher();
+        });
+        var tr = el('tr', { class: 'clickable', tabindex: 0 }, [el('td', { text: r.rec.name }), el('td', { text: r.rec.className }),
+          el('td', { class: 'num', text: r.res.total + ' / ' + r.res.max }), el('td', { class: 'num', text: r.res.pct + '%' }), el('td', { class: 'num', text: r.res.grade }), el('td', {}, [del])]);
+        tr.addEventListener('click', function () { openStudent(r); });
+        tr.addEventListener('keydown', function (e) { if (e.key === 'Enter') openStudent(r); });
+        tb.appendChild(tr);
+      });
+    t.appendChild(tb);
+  }
+  function paperTopics() { var seen = {}; questionsFor(T.paper).forEach(function (q) { seen[q.topic] = true; }); return BP.topics.filter(function (t) { return seen[t.code]; }); }
+  function shortName(n) { return n.length > 22 ? n.slice(0, 20) + '…' : n; }
+  function renderHeat(rows) {
+    var t = clear($('heat')), topics = paperTopics();
+    t.appendChild(el('thead', {}, [el('tr', {}, [el('th', { text: 'Student' })].concat(topics.map(function (tp) { return el('th', { class: 'rot', title: tp.name, text: tp.spec + ' ' + shortName(tp.name) }); })).concat([el('th', { class: 'num', text: 'Total %' })]))]));
+    var tb = el('tbody'), sums = {};
+    sortRows(rows, { key: 'n', dir: 1 }, { n: function (r) { return r.rec.name; } }).forEach(function (r) {
+      var by = {}; r.res.topics.forEach(function (x) { by[x.code] = x; });
+      var tr = el('tr', {}, [el('td', { text: r.rec.name })]);
+      topics.forEach(function (tp) {
+        var x = by[tp.code]; if (!sums[tp.code]) sums[tp.code] = { got: 0, max: 0 };
+        if (x) { sums[tp.code].got += x.got; sums[tp.code].max += x.max; }
+        tr.appendChild(el('td', { class: 'cell ' + (x ? x.rag : 'none'), title: x ? tp.name + ': ' + x.got + '/' + x.max : '', text: x ? Math.round(x.pct) : '–' }));
+      });
+      tr.appendChild(el('td', { class: 'num', text: r.res.pct + '%' }));
+      tb.appendChild(tr);
+    });
+    if (rows.length) {
+      var avg = el('tr', {}, [el('td', {}, [el('b', { text: 'Class average' })])]);
+      topics.forEach(function (tp) { var s = sums[tp.code], pc = s && s.max ? (100 * s.got) / s.max : 0; avg.appendChild(el('td', { class: 'cell ' + rag(pc), text: Math.round(pc) })); });
+      avg.appendChild(el('td', { class: 'num' }, [el('b', { text: round1(rows.reduce(function (a, r) { return a + r.res.pct; }, 0) / rows.length) + '%' })]));
+      tb.appendChild(avg);
+    }
+    t.appendChild(tb);
+  }
+  function renderQuestions(rows) {
+    var t = clear($('questions')), qs = questionsFor(T.paper), n = rows.length, order = {};
+    qs.forEach(function (q, i) { order[q.label] = i; });
+    var stats = qs.map(function (q) { var s = 0; rows.forEach(function (r) { s += r.rec.marks[q.label] || 0; }); var avg = n ? s / n : 0; return { q: q, avg: avg, fac: n ? (100 * avg) / q.marks : 0 }; });
+    var cols = [{ label: 'Question', sort: 'label' }, { label: 'Topic', sort: 'topic' }, { label: 'AO', sort: 'ao' }, { label: 'Marks', sort: 'marks', num: true },
+      { label: 'Average', sort: 'avg', num: true }, { label: 'Facility', sort: 'fac', num: true }, { label: 'Original source', sort: 'src' }];
+    t.appendChild(el('thead', {}, [headerRow('questions', cols, rows, renderQuestions)]));
+    var tb = el('tbody');
+    sortRows(stats, T.sort.questions, { label: function (r) { return order[r.q.label]; }, topic: function (r) { return topicByCode[r.q.topic].spec; }, ao: function (r) { return r.q.ao; },
+      marks: function (r) { return r.q.marks; }, avg: function (r) { return r.avg; }, fac: function (r) { return r.fac; }, src: function (r) { return r.q.src; } })
+      .forEach(function (r) {
+        var tp = topicByCode[r.q.topic];
+        tb.appendChild(el('tr', {}, [el('td', { text: r.q.label + (r.q.mcq ? ' (MCQ)' : '') }), el('td', { title: tp.name, text: tp.spec + ' ' + shortName(tp.name) }), el('td', { text: r.q.ao }),
+          el('td', { class: 'num', text: r.q.marks }), el('td', { class: 'num', text: n ? round1(r.avg) : '–' }),
+          el('td', { class: 'cell ' + (n ? rag(r.fac) : 'none'), text: n ? Math.round(r.fac) + '%' : '–' }), el('td', { class: 'small muted', text: r.q.src })]));
+      });
+    t.appendChild(tb);
+  }
+  function openStudent(r) {
+    var res = r.res;
+    $('dlg-title').textContent = r.rec.name + ' – ' + r.rec.className + ' – ' + res.paperName;
+    var body = clear($('dlg-body'));
+    body.appendChild(el('div', { class: 'score' }, [[res.total + ' / ' + res.max, 'Marks'], [res.pct + '%', 'Percentage'], [res.grade, 'Estimated grade']].map(function (x) {
+      return el('div', { class: 'stat' }, [el('div', { class: 'v', text: x[0] }), el('div', { class: 'k', text: x[1] })]); })));
+    body.appendChild(el('h3', { text: 'Topic profile' }));
+    var bars = el('div', { class: 'bars' }); res.topics.forEach(function (tp) { bars.appendChild(bar(tp.name, 'Spec ' + tp.spec, tp.pct, tp.rag, tp.got + '/' + tp.max)); }); body.appendChild(bars);
+    body.appendChild(el('h3', { text: 'To-do list' }));
+    var ul = el('ul', { class: 'todo' }); res.todo.forEach(function (it) { ul.appendChild(el('li', {}, [el('div', { class: 'box' }), el('div', {}, [el('b', { text: it.text }), el('span', { text: it.detail })])])); }); body.appendChild(ul);
+    body.appendChild(el('h3', { text: 'Marks by question' }));
+    var tbl = el('table', {}, [el('thead', {}, [el('tr', {}, ['Question', 'Topic', 'Mark', 'Out of'].map(function (x) { return el('th', { text: x }); }))])]), tb = el('tbody');
+    questionsFor(r.rec.paper).forEach(function (q) { var m = r.rec.marks[q.label] || 0; tb.appendChild(el('tr', {}, [el('td', { text: q.label }), el('td', { text: topicByCode[q.topic].name }), el('td', { class: 'cell ' + rag((100 * m) / q.marks), text: m }), el('td', { class: 'num', text: q.marks })])); });
+    tbl.appendChild(tb); body.appendChild(el('div', { class: 'tablewrap' }, [tbl]));
+    $('dlg').showModal();
+  }
+
+  // ------------------------------------------------------------ CSV
+  function csvCell(v) { var s = String(v === undefined || v === null ? '' : v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  function downloadCsv() {
+    var rows = current(), topics = paperTopics(), qs = questionsFor(T.paper);
+    var head = ['Student', 'Class', 'Paper', 'Total', 'Max', 'Percent', 'Grade'].concat(topics.map(function (t) { return t.spec + ' ' + t.name + ' %'; })).concat(qs.map(function (q) { return 'Q' + q.label + ' (/' + q.marks + ')'; }));
+    var lines = [head.map(csvCell).join(',')];
+    rows.forEach(function (r) {
+      var by = {}; r.res.topics.forEach(function (x) { by[x.code] = x; });
+      lines.push([r.rec.name, r.rec.className, r.res.paperName, r.res.total, r.res.max, r.res.pct, r.res.grade].concat(topics.map(function (t) { return by[t.code] ? by[t.code].pct : ''; }))
+        .concat(qs.map(function (q) { return r.rec.marks[q.label]; })).map(csvCell).join(','));
+    });
+    download('QLA-' + T.paper + '-' + (T.cls === 'all' ? 'all-classes' : safeName(T.cls)) + '.csv', '﻿' + lines.join('\r\n'), 'text/csv;charset=utf-8');
+  }
+  function parseCsv(text) {
+    var rows = [], row = [], cell = '', q = false;
+    for (var i = 0; i < text.length; i++) {
+      var c = text[i];
+      if (q) { if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; } else cell += c; }
+      else if (c === '"') q = true; else if (c === ',') { row.push(cell); cell = ''; }
+      else if (c === '\n' || c === '\r') { if (c === '\r' && text[i + 1] === '\n') i++; row.push(cell); rows.push(row); row = []; cell = ''; }
+      else cell += c;
+    }
+    if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+    return rows.filter(function (r) { return r.some(function (x) { return x.trim() !== ''; }); });
+  }
+  function importCsv(text, fname, report) {
+    var rows = parseCsv(text.replace(/^﻿/, ''));
+    if (rows.length < 2) return report(fname + ': no rows found.');
+    var head = rows[0].map(function (h) { return h.trim(); });
+    var iName = head.findIndex(function (h) { return /^(student|name)$/i.test(h); }), iClass = head.findIndex(function (h) { return /^class$/i.test(h); });
+    var iPaper = head.findIndex(function (h) { return /^paper$/i.test(h); });
+    if (iName < 0) return report(fname + ': needs a "Student" column.');
+    var labelCol = {};
+    head.forEach(function (h, i) { var m = h.match(/^Q?(\d{2}(?:\.\d+)?)\b/i); if (m) labelCol[m[1]] = i; });
+    var added = 0, problems = [];
+    rows.slice(1).forEach(function (r, k) {
+      var paperId = null;
+      if (iPaper >= 0) { var pv = (r[iPaper] || '').trim(); var pp = BP.papers.find(function (p) { return p.name === pv || p.id === pv; }); paperId = pp && pp.id; }
+      if (!paperId) paperId = T.paper;
+      var marks = {}; questionsFor(paperId).forEach(function (q) { if (labelCol[q.label] !== undefined) marks[q.label] = (r[labelCol[q.label]] || '').trim(); });
+      var rec = parseResultObject({ app: 'y13-physics-qla', paper: paperId, name: r[iName], className: iClass >= 0 ? (r[iClass] || '').trim() : (T.cls === 'all' ? CLASSES[0] : T.cls), marks: marks, saved: new Date().toISOString() });
+      if (typeof rec === 'string') problems.push('row ' + (k + 2) + ' (' + (r[iName] || '?') + '): ' + rec); else { upsert(rec); added++; }
+    });
+    report(fname + ': imported ' + added + ' student' + (added === 1 ? '' : 's') + '.' + (problems.length ? ' Skipped ' + problems.length + ': ' + problems.slice(0, 3).join('; ') + (problems.length > 3 ? '…' : '') : ''), problems.length ? 'error' : 'ok');
+  }
+
+  // ------------------------------------------------------------ importing
+  function report(text, kind) { $('import-log').appendChild(el('div', { class: 'msg ' + (kind || 'error'), text: text })); }
+  function importFiles(fileList) {
+    clear($('import-log'));
+    var files = Array.prototype.slice.call(fileList || []);
+    if (!files.length) return;
+    var pending = files.length, counts = { added: 0, updated: 0, older: 0 };
+    files.forEach(function (f) {
+      if (f.size > 2000000) { report(f.name + ': file too large.'); if (!--pending) done(); return; }
+      var rd = new FileReader();
+      rd.onload = function () {
+        var text = String(rd.result);
+        if (/\.csv$/i.test(f.name)) { importCsv(text, f.name, report); }
+        else {
+          try {
+            var o = JSON.parse(text);
+            if (o && o.app === 'y13-physics-qla-backup') {
+              var n = 0; Object.keys(o.records || {}).forEach(function (k) { var rec = parseResultObject(Object.assign({ app: 'y13-physics-qla' }, o.records[k])); if (typeof rec !== 'string') { upsert(rec); n++; } });
+              if (o.bounds) save(LS_BOUNDS, o.bounds);
+              report(f.name + ': backup restored (' + n + ' results).', 'ok');
+            } else {
+              var rec = parseResultObject(o);
+              if (typeof rec === 'string') report(f.name + ': ' + rec);
+              else counts[upsert(rec)]++;
+            }
+          } catch (e) {
+            var c = decodeResult(text);
+            if (typeof c === 'string') report(f.name + ': not a result file.'); else counts[upsert(c)]++;
+          }
+        }
+        if (!--pending) done();
+      };
+      rd.onerror = function () { report(f.name + ': could not be read.'); if (!--pending) done(); };
+      rd.readAsText(f);
+    });
+    function done() {
+      if (counts.added || counts.updated || counts.older) report('Added ' + counts.added + ', updated ' + counts.updated + (counts.older ? ', ignored ' + counts.older + ' older copies' : '') + '.', 'ok');
+      renderTeacher();
+    }
+  }
+  function importCodes() {
+    clear($('import-log'));
+    var text = $('codes').value, codes = text.match(/QLA1-[A-Za-z0-9+/]+/g) || [];
+    if (!codes.length) return report('No result codes found. Each code starts with QLA1-');
+    var c = { added: 0, updated: 0, older: 0 }, bad = 0;
+    codes.forEach(function (code) { var r = decodeResult(code); if (typeof r === 'string') bad++; else c[upsert(r)]++; });
+    report('Added ' + c.added + ', updated ' + c.updated + (c.older ? ', ignored ' + c.older + ' older' : '') + (bad ? '. ' + bad + ' code(s) could not be read.' : '.'), bad ? 'error' : 'ok');
+    $('codes').value = '';
+    renderTeacher();
+  }
+  function manualEntry() {
+    var name = cleanName($('m-name').value);
+    if (!name) return msg($('add-msg'), 'Type the student’s full name first.');
+    S.entryFor = 'teacher'; S.name = name; S.className = $('m-class').value; S.paper = $('m-paper').value;
+    var existing = records()[keyOf({ paper: S.paper, className: S.className, name: name })];
+    S.marks = existing ? Object.assign({}, existing.marks) : {};
+    msg($('add-msg'), ''); $('m-name').value = '';
+    buildForm();
+    show($('teacher'), false); show($('student'), true); show($('start'), false); show($('result'), false); show($('entry'), true); window.scrollTo(0, 0);
+  }
+  function clearPaperClass() {
+    var label = paperById(T.paper).name + (T.cls === 'all' ? ' (all classes)' : ' for ' + T.cls);
+    var typed = prompt('This deletes every ' + label + ' result stored on this computer.\nDownload a CSV or backup first if you need it.\n\nType DELETE to confirm:');
+    if (typed !== 'DELETE') return;
+    var all = records();
+    Object.keys(all).forEach(function (k) { var r = all[k]; if (r.paper === T.paper && (T.cls === 'all' || r.className === T.cls)) delete all[k]; });
+    save(LS_RECORDS, all); renderTeacher();
+  }
+
+  // ------------------------------------------------------------ boundaries
+  function renderBounds() {
+    $('bound-note').textContent = BP.boundaryNote;
+    var t = clear($('bounds')), b = getBounds();
+    t.appendChild(el('thead', {}, [el('tr', {}, [el('th', { text: 'Paper' })].concat(BP.defaultBoundaries.map(function (x) { return el('th', { text: x.grade + ' (%)' }); })))]));
+    var tb = el('tbody');
+    BP.papers.forEach(function (p) {
+      tb.appendChild(el('tr', {}, [el('td', { text: p.name })].concat(b[p.id].map(function (x, i) {
+        return el('td', {}, [el('input', { type: 'number', min: 0, max: 100, step: 0.5, value: x.pct, 'data-paper': p.id, 'data-i': i, 'aria-label': p.name + ' ' + x.grade })]); }))));
+    });
+    t.appendChild(tb);
+  }
+  function saveBounds() {
+    var b = getBounds();
+    Array.prototype.forEach.call(document.querySelectorAll('#bounds input'), function (inp) { b[inp.getAttribute('data-paper')][Number(inp.getAttribute('data-i'))].pct = Number(inp.value); });
+    for (var i = 0; i < BP.papers.length; i++) {
+      var list = b[BP.papers[i].id];
+      for (var j = 0; j < list.length; j++) {
+        if (!Number.isFinite(list[j].pct) || list[j].pct < 0 || list[j].pct > 100) return msg($('bound-msg'), 'Boundaries must be between 0 and 100.');
+        if (j && list[j].pct > list[j - 1].pct) return msg($('bound-msg'), BP.papers[i].name + ': ' + list[j].grade + ' cannot be higher than ' + list[j - 1].grade + '.');
+      }
+    }
+    save(LS_BOUNDS, b); msg($('bound-msg'), 'Saved. All grades have been updated.', 'ok');
+  }
+
+  // ------------------------------------------------------------ start
+  document.addEventListener('DOMContentLoaded', function () {
+    $('title').textContent = BP.title; $('subtitle').textContent = BP.subtitle;
+    Array.prototype.forEach.call(document.querySelectorAll('#modes button'), function (b) { b.addEventListener('click', function () { setMode(b.getAttribute('data-mode')); }); });
+    initStudent(); initTeacher();
+    setMode(location.hash === '#teacher' ? 'teacher' : 'student');
+  });
+})();
+
+</script>
+</body>
+</html>
